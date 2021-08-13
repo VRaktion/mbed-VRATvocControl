@@ -84,26 +84,41 @@ void VRATvocControl::getTvocMeas()
     printf("[tvocCtrl] getTvocMeas\r\n");
 
     this->tvoc->readResults();
-    iaq_2nd_gen_results_t tvocResStruct = this->tvoc->getResults();
+    this->tvocResStruct = this->tvoc->getResults();
 
-    float tvocRes[4]{
-        tvocResStruct.etoh,
-        tvocResStruct.tvoc,
-        tvocResStruct.eco2,
-        tvocResStruct.iaq};
-
-    //TODO: check vor valid data
-    printf("tvoc EtOH: %d TVOC: %d eCO2:%d IAQ:%d\r\n",
-           (int)tvocRes[0], (int)tvocRes[1],
-           (int)tvocRes[2], (int)tvocRes[3]);
-
-    if(this->tvoc->isValid()){
+    if (this->tvoc->isValid())
+    {
         printf("[tvocCtrl] valid\r\n");
-    }else{
+
+        float tvocRes[4]{
+            this->tvocResStruct.etoh,
+            this->tvocResStruct.tvoc,
+            this->tvocResStruct.eco2,
+            this->tvocResStruct.iaq};
+
+        //TODO: check vor valid data
+        printf("tvoc EtOH: %d TVOC: %d eCO2:%d IAQ:%d\r\n",
+               (int)tvocRes[0], (int)tvocRes[1],
+               (int)tvocRes[2], (int)tvocRes[3]);
+
+        this->setGatt(
+            (uint16_t)VRATvocControl::Characteristics::TvocResults,
+            tvocRes, 4);
+    }
+    else
+    {
         printf("[tvocCtrl] warmup\r\n");
     }
+}
 
-    this->setGatt(
-        (uint16_t)VRATvocControl::Characteristics::TvocResults,
-        tvocRes, 4);
+float VRATvocControl::getTvoc()
+{
+    if (this->tvoc->isValid())
+    {
+        return this->tvocResStruct.iaq;
+    }
+    else
+    {
+        return 10.0;
+    }
 }

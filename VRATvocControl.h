@@ -24,6 +24,8 @@ public:
     void initCharacteristics();
     void pastBleInit();
 
+    float getTvoc();
+
 private:
     void initTvoc();
 
@@ -48,6 +50,8 @@ private:
     static constexpr int defaultInterval{3000};
     static constexpr int minInterval{3000};
     static constexpr int maxInterval{600000};
+
+    iaq_2nd_gen_results_t tvocResStruct;
 };
 
 #endif //VRA_TVOC_CONTROL_H
